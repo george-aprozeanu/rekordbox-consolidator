@@ -1,0 +1,22 @@
+{
+  "name": "tobada",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.ts",
+  "scripts": {
+    "start": "ts-node -T -p . . export01.xml out.xml C:\\Users\\George\\OneDrive\\Music\\Adele2 C:\\Users\\George\\OneDrive\\Music\\Adele-30-Deluxe_Edition-CD-FLAC-2021-PERFECT"
+  },
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "@types/node": "^17.0.4",
+    "@types/xml2js": "^0.4.9",
+    "ts-node": "^10.0.0",
+    "typescript": "^4.0.0"
+  },
+  "dependencies": {
+    "fast-glob": "^3.2.7",
+    "xml2js": "^0.4.23"
+  }
+}
