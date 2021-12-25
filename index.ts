@@ -5,9 +5,7 @@ import fg from "fast-glob";
 import {unixify} from "fast-glob/out/utils/path";
 import {Builder, Parser} from "xml2js";
 
-const libraryXmlFile = process.argv[3];
-const outFile = process.argv[4];
-const musicLocation = process.argv.slice(5);
+const configFile = process.argv[3];
 
 interface Track {
     '$': {
@@ -21,7 +19,7 @@ function trackOrder(a: Track, b: Track) {
     return b['$'].Rating.localeCompare(a['$'].Rating);
 }
 
-function rootname(filename: string) {
+function rootName(filename: string) {
     const namePattern = /(.*)-\d/g;
     const ext = path.extname(filename);
     const basename = path.basename(filename, ext);
@@ -35,13 +33,11 @@ function rootname(filename: string) {
 
 function trackBasename(track: Track) {
     const filename = new url.URL(track['$'].Location).pathname;
-    return rootname(filename);
+    return rootName(filename);
 }
 
 
-async function readLibrary(libraryXmlFile: string, sources: Map<string, string>) {
-    const parser = new Parser();
-    const library = await parser.parseStringPromise(await fs.readFile(libraryXmlFile));
+async function readLibrary(library: any, sources: Map<string, string>) {
     const Parent = library['DJ_PLAYLISTS']['COLLECTION'][0];
     const trackNames = new Map<string, any>();
     for (const track of Parent.TRACK) {
@@ -68,16 +64,18 @@ async function readLibrary(libraryXmlFile: string, sources: Map<string, string>)
         const basename = path.basename(new url.URL(track['$'].Location).pathname);
         track['$'].Location = `file://localhost/${sources.get(basename)!}`;
     })
-    return new Builder().buildObject(library);
+    return library;
 }
 
 async function getSources(musicLocation: string[]) {
     const sources = await fg(musicLocation.map(dir => unixify(path.join(dir, '**'))));
-    return new Map(sources.map(source => [rootname(source), source]));
+    return new Map(sources.map(source => [rootName(source), source]));
 }
 
 (async function main() {
-    const sources = await getSources(musicLocation);
-    const output = await readLibrary(libraryXmlFile, sources);
-    await fs.writeFile(outFile, output);
+    const {input, output, musicDirs} = JSON.parse(await fs.readFile(configFile, "utf-8"));
+    const sources = await getSources(musicDirs);
+    let library = await new Parser().parseStringPromise(await fs.readFile(input));
+    library = await readLibrary(library, sources);
+    await fs.writeFile(output, new Builder().buildObject(library));
 })().catch(console.error);

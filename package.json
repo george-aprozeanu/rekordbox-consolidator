@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.ts",
   "scripts": {
-    "start": "ts-node -T -p . . export01.xml out.xml C:\\Users\\George\\OneDrive\\Music\\Adele2 C:\\Users\\George\\OneDrive\\Music\\Adele-30-Deluxe_Edition-CD-FLAC-2021-PERFECT"
+    "start": "ts-node -T -p . . config.json"
   },
   "author": "",
   "license": "ISC",
